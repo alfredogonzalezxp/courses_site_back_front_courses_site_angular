@@ -104,15 +104,28 @@ jobs:
         run: |
           npm install --legacy-peer-deps
           npm run build -- --base-href /courses_site_back_front_courses_site_angular/
-          # Robust Fix: If the build put files in a /browser subfolder, move them to the root of dist
-          if [ -d "dist/my-angular-app/browser" ]; then
-            cp -r dist/my-angular-app/browser/* dist/my-angular-app/
+
+          # Dynamic Path Detection: Find the folder containing index.html
+          # We search inside coursefront/dist/
+          INDEX_FILE=$(find dist -name "index.html" | head -n 1)
+          if [ -z "$INDEX_FILE" ]; then
+            echo "ERROR: index.html not found in dist folder!"
+            ls -R dist
+            exit 1
           fi
-          # Create the 404.html fallback at the root of the distribution
-          cp dist/my-angular-app/index.html dist/my-angular-app/404.html
+
+          INDEX_DIR=$(dirname "$INDEX_FILE")
+          echo "Found index.html in: $INDEX_DIR"
+
+          # Create 404.html fallback for Angular routing
+          cp "$INDEX_FILE" "$INDEX_DIR/404.html"
+
+          # Export the folder path for the Deployment step
+          # Note: Deployment step needs path relative to repo root
+          echo "DEPLOY_PATH=coursefront/$INDEX_DIR" >> $GITHUB_ENV
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: coursefront/dist/my-angular-app
+          folder: ${{ env.DEPLOY_PATH }}
           branch: gh-pages
