@@ -104,10 +104,15 @@ jobs:
         run: |
           npm install --legacy-peer-deps
           npm run build -- --base-href /courses_site_back_front_courses_site_angular/
-          cp dist/my-angular-app/browser/index.html dist/my-angular-app/browser/404.html
+          # Robust Fix: If the build put files in a /browser subfolder, move them to the root of dist
+          if [ -d "dist/my-angular-app/browser" ]; then
+            cp -r dist/my-angular-app/browser/* dist/my-angular-app/
+          fi
+          # Create the 404.html fallback at the root of the distribution
+          cp dist/my-angular-app/index.html dist/my-angular-app/404.html
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: coursefront/dist/my-angular-app/browser
+          folder: coursefront/dist/my-angular-app
           branch: gh-pages
