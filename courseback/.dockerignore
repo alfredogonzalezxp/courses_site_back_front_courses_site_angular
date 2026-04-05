@@ -1,0 +1,10 @@
+target/
+.mvn/
+.vscode/
+.git/
+.gitignore/
+Dockerfile
+docker-compose.yml
+*.jar
+mvnw
+mvnw.cmd

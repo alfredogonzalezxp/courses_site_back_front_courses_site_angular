@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: courses-db
+    environment:
+      POSTGRES_DB: appdbang
+      POSTGRES_USER: adminbckang
+      POSTGRES_PASSWORD: StrongPassw0rd-2029!
+    ports:
+      - "5433:5432" 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adminbckang -d appdbang"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  backend:
+    build: 
+      context: ./courseback
+    container_name: courses-backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://database:5432/appdbang
+      DB_USER: adminbckang
+      DB_PASSWORD: StrongPassw0rd-2029!
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./coursefront
+    container_name: courses-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

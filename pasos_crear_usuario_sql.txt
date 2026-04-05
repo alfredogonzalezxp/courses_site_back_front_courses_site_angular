@@ -1,0 +1,33 @@
+CREATE DATABASE appdbang;
+CREATE USER adminbckang WITH PASSWORD 'StrongPassw0rd-2029!';
+GRANT ALL PRIVILEGES ON DATABASE appdbang TO adminbckang
+
+psql "host=localhost port=5433 dbname=appdbang user=adminbckang password=StrongPassw0rd-2029! sslmode=disable"
+
+
+psql -h localhost -p 5433 -U postgres -d appdbang
+
+
+
+
+GRANT USAGE, CREATE ON SCHEMA public TO adminbckang;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO adminbckang;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO adminbckang;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO adminbckang;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO adminbckang;
+
+
+
+
+CERATE TABLE
+
+CREATE TABLE users (
+id SERIAL PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  rol VARCHAR(50) NOT NULL
+);
+
+ALTER TABLE users
+DROP COLUMN role;
