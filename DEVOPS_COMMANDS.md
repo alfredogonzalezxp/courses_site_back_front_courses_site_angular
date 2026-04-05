@@ -147,3 +147,30 @@ This section provides a way to run the entire project's validation process with 
   1. **Stage 1 (Backend)**: Cleans and runs Maven JUnit tests.
   2. **Stage 2 (Frontend)**: Runs Vitest component/logic tests in a single pass.
   3. **Stage 3 (Docker)**: Validates that `docker-compose.yml` can still build everything from scratch.
+
+
+Add all changes:
+powershell
+git add .
+Commit your work:
+powershell
+git commit -m "feat: updated login and backend API"
+Step 4: The Local DevOps Chain
+Now, run the push command from the root directory:
+
+powershell
+git push
+This will automatically trigger the following sequence:
+
+Backend CI: Runs Maven tests (./mvnw clean test).
+Frontend CI: Runs Vitest tests (npm test).
+Docker Check: Builds your Docker images to make sure they are valid.
+IMPORTANT
+
+If any of these fail, the push will stop. You will see the error in your terminal. You must fix the code before you can push again!
+
+Step 5: The GitHub DevOps Chain
+Once the local push succeeds, go to GitHub.com > Actions.
+
+Automatic Checkout: GitHub will now see all your files (including package.json and package-lock.json).
+Parallel Running: It will run your tests in the cloud to triple-check everything.

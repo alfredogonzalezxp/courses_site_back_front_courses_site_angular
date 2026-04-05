@@ -1,8 +1,8 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
-import axios from 'axios';
-import { Observable, from, BehaviorSubject } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { LoginRequest, SignupRequest, JwtAuthenticationResponse } from './types';
 
 /*
@@ -48,7 +48,10 @@ export class AuthService {
   // The 'constructor' runs the exact moment Angular creates this Service.
   // - @Inject(PLATFORM_ID): We ask Angular to hand us a tool that answers one question:
   //   "Is this code running securely in a Browser (Chrome) or on a Server (Node.JS)?"
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private http: HttpClient
+  ) {
 
     // a. We start up the Two-Way Walkie Talkie (BehaviorSubject).
     // What is its starting value? We run hasToken() to check localStorage.
@@ -84,24 +87,8 @@ and the Observable lets us wait for it cleanly!
 */
   login(credentials: LoginRequest): Observable<JwtAuthenticationResponse> {
 
-    // from(...): Converts the standard Axios Promise into an Angular Observable.
-    return from(axios.post<JwtAuthenticationResponse>(`${this.apiUrl}/signin`, credentials)).pipe(
-
-      // map: Cuts off all the heavy HTTP network metadata, giving us just the raw data.
-      /*
-      Yes, exactly! The response inside that map() is the full Axios response object.
-It receives the big Axios response, and returns ONLY the .data part.
-
-response = The big object Axios gives you (contains status, headers, config, data).
-=> = "then return..."
-response.data = Just the .data property (your JWT token).
-Before map: { status: 200, headers: {...}, data: { accessToken: "eyJ..." } }
-
-After map: { accessToken: "eyJ..." }
-
-Everything else is thrown away. Only .data survives and moves forward!
-      */
-      map(response => response.data),
+    // HttpClient automatically parses the JSON response and returns it as an Observable, so we don't need 'from' or 'map'.
+    return this.http.post<JwtAuthenticationResponse>(`${this.apiUrl}/signin`, credentials).pipe(
 
       // tap: Allows us to peek at the data and do a side-effect (like saving to storage)
       // without modifying the data passing through the stream.
@@ -124,9 +111,7 @@ Everything else is thrown away. Only .data survives and moves forward!
   }
 
   signup(user: SignupRequest): Observable<any> {
-    return from(axios.post(`${this.apiUrl}/signup`, user)).pipe(
-      map(response => response.data)
-    );
+    return this.http.post(`${this.apiUrl}/signup`, user);
   }
 
   // 5. THE LOGOUT FLOW

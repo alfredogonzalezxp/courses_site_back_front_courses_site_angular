@@ -3,13 +3,21 @@
 
 $HookPath = ".git/hooks/pre-push"
 $HookContent = @"
-#!/usr/bin/env pwsh
-Write-Host "`nRunning Local CI/CD Validation before push..." -ForegroundColor Cyan
-./local-ci.ps1
-if (`$LASTEXITCODE -ne 0) {
-    Write-Host "`n[!] Push cancelled: Local validation failed." -ForegroundColor Red
+#!/bin/sh
+# Git for Windows runs hooks using Bash (MinGW).
+# We use Bash to trigger the PowerShell CI script safely.
+
+echo ""
+echo "Running Local CI/CD Validation before push..."
+# Call pwsh with NoProfile and ExecutionPolicy Bypass for maximum compatibility.
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./local-ci.ps1"
+
+if [ `$? -ne 0 ]; then
+    echo ""
+    echo "[!] Push cancelled: Local validation failed."
     exit 1
-}
+fi
+
 exit 0
 "@
 
