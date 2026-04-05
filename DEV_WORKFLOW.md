@@ -26,7 +26,17 @@ graph TD
 
 Before you push any code to GitHub, you should follow this sequence of commands to ensure high quality.
 
-| Step | Command | Purpose (The "Why") | When to use it? |
+### 2.1 Automatic Local Validation (NEW)
+
+I have installed a **Git Pre-Push Hook** in your project.
+- **What it does**: Whenever you run `git push`, the system will **automatically** run `./local-ci.ps1`.
+- **Why**: This prevents you from accidentally pushing code that breaks the build, saving time and keeping your GitHub Actions history clean.
+- **Bypassing**: If you are in a rush and KNOW the code is fine, you can bypass this check using:
+  ```bash
+  git push --no-verify
+  ```
+
+### 2.2 Command Table
 | :--- | :--- | :--- | :--- |
 | **1. Validate** | `./local-ci.ps1` | **Absolute Verification**. Runs Backend tests, Frontend tests, and validates Docker from scratch. | **Mandatory** before every `git push`. |
 | **2. Build** | `docker compose build` | Ensures the Docker images can still be created after your changes. | After changing `Dockerfile` or `pom.xml`/`package.json`. |

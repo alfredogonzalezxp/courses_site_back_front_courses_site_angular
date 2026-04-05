@@ -44,15 +44,21 @@ docker-compose down
 
 ### 2.1 The Workflow
 
-**Path**: `.github/workflows/backend-ci.yml`
-This is triggered automatically on every `push` or `pull_request` to the `main`/`master` branches.
+**Path**: [main.yml](file:///c:/Users/Alfrredo/Documents/Angular/devcourses/.github/workflows/main.yml)
+This is the **Unified Full-Stack Chain**. It is triggered automatically on every `push` or `pull_request` to the `main`/`master` branches.
 
-**Key Steps**:
+**Key Stages**:
 
-1.  **PostgreSQL Service**: GitHub spins up a real database container for the tests.
-2.  **JDK Setup**: Sets up Java 21 environment.
-3.  **Maven Test**: Runs `./mvnw clean test`. This executes **all your JUnit and Mockito tests**. If any test fails, the build stops and alerts you.
-4.  **Artifact Upload**: If all tests pass, it packages the JAR and uploads it as a GitHub artifact for deployment.
+1.  **Backend Stage**:
+    - Spins up PostgreSQL 15.
+    - Sets up JDK 21.
+    - Runs `./mvnw clean test` (JUnit + Mockito).
+2.  **Frontend Stage**:
+    - Sets up Node 22.
+    - Installs dependencies (`--legacy-peer-deps`).
+    - Runs Vitest component tests.
+3.  **Docker Validation**:
+    - Validates that the entire full-stack project builds successfully using `docker compose build`.
 
 ---
 
