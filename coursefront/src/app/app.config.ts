@@ -1,5 +1,5 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withHashLocation } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 
 import { routes } from './app.routes';
@@ -11,8 +11,8 @@ import { routes } from './app.routes';
  * for all application-wide services and settings in modern Standalone Angular.
  *
  * providers array:
- * - provideRouter(routes): Registers the main application routes, allowing Angular to
- *   navigate between different components (like /login or /dashboard) based on the URL.
+ * - provideRouter(routes, withHashLocation()): Registers the main application routes with Hash routing enabled.
+ *   This is the standard approach for hosting on platforms like GitHub Pages to avoid 404 errors.
  *
  * - provideHttpClient(withFetch()): Registers the HttpClient service globally, allowing
  *   the application to make HTTP requests (GET, POST, etc.) to your backend.
@@ -20,7 +20,7 @@ import { routes } from './app.routes';
  */
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(routes, withHashLocation()), 
     provideHttpClient(withFetch())
   ]
 };
