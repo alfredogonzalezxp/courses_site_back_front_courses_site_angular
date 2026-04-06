@@ -101,12 +101,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      // Small delay to ensure view is ready for animation
-      setTimeout(() => {
-        this.shouldAnimate = true;
-      }, 50);
-    }
+    // We keep shouldAnimate true by default for better SSR and hydration stability.
   }
 
   /*
