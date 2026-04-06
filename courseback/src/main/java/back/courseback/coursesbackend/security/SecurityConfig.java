@@ -161,7 +161,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Allowed domains (Angular on 4200, Vue/Vite on 5173)
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:5173",
+                "https://alfredogonzalezxp.github.io/courses_site_back_front_courses_site_angular/"));
 
         // Allowed HTTP methods
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
