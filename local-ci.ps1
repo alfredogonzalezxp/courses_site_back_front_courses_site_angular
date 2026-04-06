@@ -25,6 +25,9 @@ try {
     Push-Location coursefront
     Write-Host "Running: npm test -- --reporters=verbose --watch=false"
     npm test -- --reporters=verbose --watch=false
+    
+    Write-Host "Validating Frontend Build with correct flags..."
+    npm run build -- --configuration production --base-href /courses_site_back_front_courses_site_angular/ --deploy-url /courses_site_back_front_courses_site_angular/
     Pop-Location
 } catch {
     Write-Host "`n[!] Frontend CI Failed!" -ForegroundColor Red

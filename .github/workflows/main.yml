@@ -103,7 +103,7 @@ jobs:
         working-directory: ./coursefront
         run: |
           npm install --legacy-peer-deps
-          npm run build -- --base-href /courses_site_back_front_courses_site_angular/
+          npm run build -- --configuration production --base-href /courses_site_back_front_courses_site_angular/ --deploy-url /courses_site_back_front_courses_site_angular/
 
           # Dynamic Path Detection: Find the folder containing index.html
           # We search inside coursefront/dist/

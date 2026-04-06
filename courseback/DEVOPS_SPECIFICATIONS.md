@@ -108,6 +108,7 @@ docker logs -f courses-app
 ## 5. How it Works (The Workflow)
 
 When you run `docker-compose up --build`, the following happens:
+
 1.  **Isolation**: Docker creates two virtual "mini-computers" (containers).
 2.  **Database**: It downloads **PostgreSQL 15** into the first container.
 3.  **App Build**: It copies your project into the second container, downloads Maven, and compiles your code into a JAR.
@@ -151,3 +152,19 @@ Web applications must run over HTTPS.
 
 > [!TIP]
 > **Your Structure is Ready**: Because we used **Environment Variables**, you don't need to change any code to go to production! You just need to provide the REAL values at the moment you deploy.
+
+Option A: Skip the local hook (fast push)
+
+bash
+git add .
+git commit -m "your message"
+git push --no-verify
+--no-verify skips the local pre-push hook. Your code goes straight to GitHub, and the CI/CD pipeline runs in the cloud instead of on your machine.
+
+Option B: Remove the hook entirely (recommended — the cloud CI already does the same thing)
+
+bash
+del .git\hooks\pre-push
+After this, every normal git push will go straight to GitHub and trigger the workflow without the local delay.
+
+Would you like me to remove the pre-push hook so that a regular git push always works instantly and triggers the GitHub workflow?
