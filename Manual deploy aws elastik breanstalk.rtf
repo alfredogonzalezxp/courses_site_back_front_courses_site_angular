@@ -1,0 +1,310 @@
+{\rtf1\fbidis\ansi\ansicpg1252\deff0\nouicompat\deflang2058{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset1 Cambria Math;}{\f4\fnil\fcharset1 Segoe UI Symbol;}{\f5\fnil\fcharset1 Segoe UI Emoji;}}
+{\colortbl ;\red0\green0\blue255;}
+{\*\generator Riched20 10.0.19041}{\*\mmathPr\mmathFont3\mwrapIndent1440 }\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang10 MANUAL TO SETTING ELASTIK BREANSTALK WITH YOU JAVA  SPRINGBOOT MAVEN  BACKEND\par
+Yes. For a Java Spring Boot Maven backend, the most practical AWS path that can be free or nearly free for a new AWS account is:\par
+Elastic Beanstalk for the app\par
+EC2 t3.micro/t2.micro free tier underneath it\par
+Optional RDS PostgreSQL free tier if you need a database\par
+AWS currently says new customers can start with up to $200 in Free Tier credits, and EC2 plus RDS still have free-tier-eligible small instances in the current AWS Free Tier materials. Elastic Beanstalk itself has no extra charge; you pay only for the AWS resources it creates.\par
+Best choice for you\par
+Use Elastic Beanstalk. It is easier than configuring raw EC2 by hand, and AWS officially supports deploying Java applications there. Elastic Beanstalk creates and manages the EC2 instance, deployment flow, health checks, and environment for you.\par
+Step 0. What you need before uploading\par
+On your computer, have these ready:\par
+Java 17 or 21 installed\par
+Maven\par
+Your Spring Boot project runs locally\par
+An AWS account\par
+A region selected, for example us-east-1\par
+If your project uses a database, be aware that database hosting is separate from the app. RDS PostgreSQL has free-tier-eligible small instances for eligible accounts, but it is not included automatically with your app.\par
+Step 1. Make sure your app runs locally\par
+In your project folder, run:\par
+./mvnw clean package\par
+That should create a JAR in target/, something like:\par
+target/myapp-0.0.1-SNAPSHOT.jar\par
+Then test it:\par
+java -jar target/myapp-0.0.1-SNAPSHOT.jar\par
+Open:\par
+{{\field{\*\fldinst{HYPERLINK http://localhost:8080/api/health }}{\fldrslt{http://localhost:8080/api/health\ul0\cf0}}}}\f0\fs22\par
+If it does not run locally, do not upload yet.\par
+Step 2. Make your Spring Boot app production-ready\par
+In src/main/resources/application.properties, put something like this:\par
+server.port=5000\line spring.profiles.active=prod\par
+Why port 5000? Elastic Beanstalk Java environments commonly expect the app to listen on port 5000 for the reverse proxy setup used by AWS examples and Java platform guidance. AWS documents Java deployment support on Elastic Beanstalk; using 5000 is a common safe setup for Spring Boot there.\par
+If your app already reads PORT from environment variables, that is even better. For example:\par
+server.port=$\{PORT:5000\}\par
+Use that version if possible.\par
+Step 3. Check your pom.xml\par
+Make sure your pom.xml builds a runnable JAR.\par
+A normal Spring Boot Maven setup should include:\par
+<packaging>jar</packaging>\par
+And the Spring Boot Maven plugin:\par
+<build>\par
+    <plugins>\par
+        <plugin>\par
+            <groupId>org.springframework.boot</groupId>\par
+            <artifactId>spring-boot-maven-plugin</artifactId>\par
+        </plugin>\par
+    </plugins>\par
+</build>\par
+Then rebuild:\par
+./mvnw clean package\par
+Step 4. Create the deploy ZIP\par
+Elastic Beanstalk can deploy Java applications directly. The easy way is to upload the runnable JAR inside a ZIP file.\par
+Create a folder, for example deploy, and copy your JAR there.\par
+Inside that folder, rename the JAR to:\par
+application.jar\par
+So the folder contains:\par
+deploy/\par
+  application.jar\par
+Then zip the contents so you get:\par
+deploy.zip\par
+Important: the ZIP should contain application.jar at the root, not inside nested folders.\par
+Step 5. Go to AWS Elastic Beanstalk\par
+In AWS Console:\par
+Open Elastic Beanstalk\par
+Click Create application\par
+Application name: for example springboot-backend\par
+Platform: Java\par
+Platform branch: use the current Java branch shown by AWS\par
+Application code: Upload your code\par
+Upload your deploy.zip\par
+AWS\f1\rquote\f0 s Java deployment docs and getting-started docs walk through creating a Java environment in Elastic Beanstalk.\par
+Step 6. Choose free-tier-friendly settings\par
+When configuring the environment:\par
+Environment type: Web server environment\par
+Presets: Single instance if available\par
+Instance type: choose t3.micro or t2.micro if your account is eligible\par
+Capacity: keep it to 1 instance\par
+Load balancer: avoid adding one for a learning project, because extra resources can cost money\par
+EC2 free-tier materials still reference small instances like t3.micro, and Elastic Beanstalk itself does not add a platform fee.\par
+Step 7. Create the service roles if AWS asks\par
+Elastic Beanstalk may ask for:\par
+a service role\par
+an EC2 instance profile\par
+Usually AWS can create or suggest them automatically during setup. AWS documents that Elastic Beanstalk environments use these roles for monitoring and instance access.\par
+If you see default options such as:\par
+aws-elasticbeanstalk-service-role\par
+aws-elasticbeanstalk-ec2-role\par
+choose them or let AWS create them.\par
+Step 8. Wait for deployment\par
+After clicking Create application, AWS will:\par
+create the environment\par
+launch the EC2 instance\par
+deploy your JAR\par
+give you a URL like:\par
+{{\field{\*\fldinst{HYPERLINK http://springboot-backend-env.eba-xxxxx.us-east-1.elasticbeanstalk.com }}{\fldrslt{http://springboot-backend-env.eba-xxxxx.us-east-1.elasticbeanstalk.com\ul0\cf0}}}}\f0\fs22\par
+Open that URL in your browser.\par
+If your app has an endpoint like:\par
+/api/hello\par
+test:\par
+{{\field{\*\fldinst{HYPERLINK http://your-environment-url/api/hello }}{\fldrslt{http://your-environment-url/api/hello\ul0\cf0}}}}\f0\fs22\par
+Step 9. If your app uses PostgreSQL\par
+You have two paths:\par
+Option A: easiest for learning\par
+Use a database inside RDS PostgreSQL.\par
+AWS currently lists free-tier-eligible small RDS instances for PostgreSQL for eligible accounts, with storage allowances.\par
+Option B: cheapest for now\par
+Temporarily test with an embedded DB like H2 just to confirm deployment works.\par
+For a real backend, use RDS.\par
+Step 10. Connect Spring Boot to RDS later\par
+When you create RDS PostgreSQL, AWS gives you:\par
+endpoint\par
+port\par
+database name\par
+username\par
+password\par
+\par
+Then in Elastic Beanstalk, open:\par
+Configuration\par
+Software or Environment properties\par
+Add variables such as:\par
+SPRING_DATASOURCE_URL=jdbc:postgresql://your-rds-endpoint:5432/yourdb\par
+SPRING_DATASOURCE_USERNAME=youruser\par
+SPRING_DATASOURCE_PASSWORD=yourpassword\par
+SPRING_JPA_HIBERNATE_DDL_AUTO=update\par
+And in application.properties:\par
+spring.datasource.url=$\{SPRING_DATASOURCE_URL\}\par
+spring.datasource.username=$\{SPRING_DATASOURCE_USERNAME\}\par
+spring.datasource.password=$\{SPRING_DATASOURCE_PASSWORD\}\par
+spring.jpa.hibernate.ddl-auto=$\{SPRING_JPA_HIBERNATE_DDL_AUTO:update\}\par
+That way you do not hardcode secrets.\par
+Step 11. Common problems and fixes\par
+Problem: app starts locally but fails on AWS\par
+Usually one of these:\par
+wrong port\par
+bad Java version\par
+app crashes on startup because DB env vars are missing\par
+your ZIP structure is wrong\par
+Fixes:\par
+Use:\par
+server.port=$\{PORT:5000\}\par
+Make sure your Maven build targets a Java version supported by the Beanstalk Java platform you selected. AWS Java platforms are documented in Elastic Beanstalk\f1\rquote\f0 s Java deployment docs.\par
+Problem: 502 Bad Gateway\par
+Usually your Spring Boot app did not start.\par
+Open Elastic Beanstalk:\par
+Environment\par
+Logs\par
+Request logs / Last 100 lines\par
+Check the startup exception.\par
+Step 12. Very important cost warning\par
+\f1\ldblquote\f0 Free\f1\rdblquote  \f0 on AWS usually means one of these:\par
+within new account free tier / credits\par
+only for small resources\par
+only if you avoid extra services\par
+To reduce risk:\par
+use 1 single EC2 instance\par
+do not add load balancer unless needed\par
+stop/delete unused environments\par
+avoid adding NAT gateways or other paid networking components\par
+check Billing dashboard\par
+AWS\f1\rquote\f0 s current Free Tier page emphasizes credits for new customers and always-free/free-plan distinctions, so watch your account carefully.\par
+Fastest path summary\par
+Do this in order:\par
+Run locally\par
+./mvnw clean package\par
+java -jar target/yourapp.jar\par
+Set:\par
+server.port=$\{PORT:5000\}\par
+Put the JAR in a ZIP as:\par
+application.jar\par
+In AWS:\par
+Elastic Beanstalk\par
+Create application\par
+Platform: Java\par
+Upload ZIP\par
+Single instance\par
+t3.micro/t2.micro if eligible\par
+Deploy and test the provided URL\par
+My recommendation for you\par
+For your case, use this exact plan first:\par
+Spring Boot Maven app\par
+Elastic Beanstalk\par
+Single instance\par
+No database yet for first test\par
+After the app works, add RDS PostgreSQL\par
+That is the safest step-by-step path for learning AWS deployment without getting lost.\par
+I can now give you the exact file structure, application.properties, and pom.xml example for your Spring Boot Maven project so you can deploy it without guessing.\par
+In case that appears bad gateway.\par
+First fix: change Java version\par
+In your screenshot, click:\par
+Cambiar la versi\'f3n\par
+Then choose one of these:\par
+Corretto 17\par
+or Corretto 21\par
+Use the one that matches your project.\par
+How to know which one your project uses\par
+Open your pom.xml and look for something like:\par
+<java.version>17</java.version>\par
+Second fix: check if your app is listening on the correct port.\line add to pom.xml\line And packaging should be jar:\par
+<packaging>jar</packaging>\par
+In Spring Boot, put this in src/main/resources/application.properties:\par
+server.port=5000\par
+Better:\par
+server.port=$\{PORT:5000\}\line server.port=$\{PORT:5000\}\par
+Then rebuild:\par
+./mvn clean package\line\line generates .jar file put in deploy folder and chage the name of application and then add to zip.\par
+Option B: configure DB environment variables in Elastic Beanstalk\par
+Go to:\par
+Configuraci\'f3n\par
+Variables de entorno\par
+And add values like:\par
+SPRING_DATASOURCE_URL=jdbc:postgresql://host:5432/dbname\par
+SPRING_DATASOURCE_USERNAME=youruser\par
+SPRING_DATASOURCE_PASSWORD=yourpassword\par
+And in application.properties:\par
+spring.datasource.url=$\{SPRING_DATASOURCE_URL\}\par
+spring.datasource.username=$\{SPRING_DATASOURCE_USERNAME\}\par
+spring.datasource.password=$\{SPRING_DATASOURCE_PASSWORD\}\par
+Step 1. Go to Elastic Beanstalk environment variables\par
+In your environment:\par
+Configuraci\'f3n\par
+find Variables de entorno or Software\par
+click Editar\par
+Add these variables:\par
+SPRING_DATASOURCE_URL=jdbc:postgresql://database-ang.clu6eegyos34.us-east-2.rds.amazonaws.com:5432/appdbang\par
+SPRING_DATASOURCE_USERNAME=adminbckang\par
+SPRING_DATASOURCE_PASSWORD=YOUR_REAL_PASSWORD\par
+SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect\par
+SERVER_PORT=5000\par
+LAST STEP.\par
+Perfect \f1\emdash  this actually clarifies everything \f2\u-10179?\u-8923?\f0\par
+And now we can be very precise:\par
+\f2\u-10179?\u-9143?\f1  \f0 Your setup is already correct:\par
+Elastic Beanstalk \f3\u8594?\f1  \f0 us-east-2 (Ohio) \f4\u9989?\f0\par
+RDS PostgreSQL \f3\u8594?\f1  \f0 us-east-2 (Ohio) \f4\u9989?\f0\par
+So region is NOT the problem anymore.\par
+\f2\u-10179?\u-8536?\f1  \f0 Then what is the real problem?\par
+Your logs already told us clearly:\par
+\f2\u-10179?\u-9143?\f1  \f0 Connect timed out\par
+That means:\par
+\f4\u10060?\f1  \f0 Not wrong password\par
+\f4\u10060?\f1  \f0 Not wrong DB name\par
+\f4\u10060?\f1  \f0 Not region\par
+\f4\u9989?\f1  \f0 NETWORK BLOCKED\par
+\f2\u-10180?\u-8273?\f1  \f0 EXACT ROOT CAUSE\par
+Your Elastic Beanstalk cannot reach your RDS instance\par
+This is almost always:\par
+\f2\u-10179?\u-9143?\f1  \f0 Security Group misconfiguration\par
+\f2\u-10179?\u-8923?\f1  \f0 FIX THIS (MOST IMPORTANT STEP)\par
+Step 1: Find Elastic Beanstalk Security Group\par
+Go to:\par
+EC2 \f3\u8594?\f1  \f0 Instances\par
+Find your Beanstalk instance\par
+Click it\par
+Copy the Security Group ID\par
+Example:\par
+sg-0abc123456\par
+Step 2: Add rule in RDS Security Group\par
+Go to:\par
+RDS \f3\u8594?\f1  \f0 your database\par
+Click:\par
+Connectivity & security\par
+Open Security Group\par
+Edit Inbound rules\par
+Add this:\par
+Type: PostgreSQL\par
+Port: 5432\par
+Source: sg-XXXX (your Elastic Beanstalk SG)\par
+\f2\u-10179?\u-9143?\f1  \f0 This is the KEY fix\par
+\f5\u-10178?\u-8726?\f1  \f0 Why this matters\par
+Right now:\par
+EB tries to connect \f3\u8594?\f1  \f4\u10060?\f1  \f0 blocked\par
+DB never responds \f3\u8594?\f1  \f4\u9201?\f1  \f0 timeout\par
+Spring crashes \f3\u8594?\f1  \f2\u-10179?\u-9051?\f0\par
+Nginx \f3\u8594?\f1  \f0 502 error\par
+Exactly what your logs show.\par
+\f2\u-10179?\u-8947?\f1  \f0 Optional quick test (to confirm)\par
+Temporarily (just for testing):\par
+Source: 0.0.0.0/0\par
+If it suddenly works \f3\u8594?\f1  \f0 you CONFIRMED it's security group issue\par
+Then replace it with the EB security group (secure way)\par
+\f5\u9888?\u-497?\f1  \f0 ALSO VERIFY THIS (quick checklist)\par
+1. Correct URL\par
+jdbc:postgresql://database-ang.clu6eegyos34.us-east-2.rds.amazonaws.com:5432/appdbang\par
+2. Correct port\par
+\f2\u-10179?\u-9143?\f1  \f0 Must be:\par
+5432\par
+NOT 5433 (that was your local machine)\par
+3. App port\par
+Make sure:\par
+server.port=5000\par
+Because Nginx is calling 5000\par
+\f5\u-10178?\u-8736?\f1  \f0 Final diagnosis (100% clear)\par
+Your issue is:\par
+\f2\u-10179?\u-9143?\f1  \f4\u10060?\f1  \f0 Security group blocking PostgreSQL connection\par
+\f2\u-10179?\u-9143?\f1  \f0 NOT region\par
+\f2\u-10179?\u-9143?\f1  \f0 NOT code\par
+\f2\u-10179?\u-9143?\f1  \f0 NOT Spring Boot\par
+\f2\u-10179?\u-8576?\f1  \f0 What will happen after fix\par
+Spring Boot will start correctly \f4\u9989?\f0\par
+DB connection will succeed \f4\u9989?\f0\par
+/api/health will respond \f4\u9989?\f0\par
+502 error will disappear \f4\u9989?\f0\par
+If you want\par
+Send me:\par
+screenshot of RDS inbound rules\par
+screenshot of EB security group\par
+and I\f1\rquote\f0 ll point EXACTLY what is wrong in 10 seconds \f2\u-10179?\u-9046?\f0\lang10\par
+}
+ 

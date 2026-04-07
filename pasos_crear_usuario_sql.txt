@@ -1,23 +1,69 @@
+1 ENTER TO AURORA RDS AND SELECT CREATE DATABASE SELECT POSTGREE SQL
+2 SELECT ALL THE BASICS ONLY FOR MAKE TESTS.
+3 ACTIVATE PUBLIC ACCESSING.
+4 CRATE DATABASE.
+ROOT USER.
+ USER: aadminbckang
+ CONTRASEÑA: alfredo77
+database Endpoint: database-ang.clu6eegyos34.us-east-2.rds.amazonaws.com
+front end: https://alfredogonzalezxp.github.io/courses_site_back_front_courses_site_angular/
+
+IN CONECTIVITY AND SECURITY TAKE THE ENDPOINT TO USE IT. IN THIS CASE IS
+psql "host=database-ang.clu6eegyos34.us-east-2.rds.amazonaws.com port=5432 dbname=postgres user=aadminbckang sslmode=verify-full sslrootcert=./global-bundle.pem"
+
+GO TO SECURITY GROUP
+Reglas del grupo de seguridad (2)
+AND APPLY THIS RULE
+
+Create a NEW rule correctly
+Click:
+👉 Agregar regla
+Fill it like this:
+Type: PostgreSQL
+Protocol: TCP
+Port: 5432
+Source: My IP
+
+THEN.
+Test-NetConnection database-ang.clu6eegyos34.us-east-2.rds.amazonaws.com -Port 5432
+
+THEN
+
+CONNECT TO ROOT DATABASE 
+psql -h database-ang.clu6eegyos34.us-east-2.rds.amazonaws.com -U aadminbckang -d postgres
+password: alfredo77
+
+THEN
+
 CREATE DATABASE appdbang;
 CREATE USER adminbckang WITH PASSWORD 'StrongPassw0rd-2029!';
-GRANT ALL PRIVILEGES ON DATABASE appdbang TO adminbckang
-
-psql "host=localhost port=5433 dbname=appdbang user=adminbckang password=StrongPassw0rd-2029! sslmode=disable"
-
-
-psql -h localhost -p 5433 -U postgres -d appdbang
-
-
-
-
+GRANT ALL PRIVILEGES ON DATABASE appdbang TO adminbckang;
 GRANT USAGE, CREATE ON SCHEMA public TO adminbckang;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO adminbckang;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO adminbckang;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO adminbckang;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO adminbckang;
+GRANT USAGE, CREATE ON SCHEMA public TO adminbckang;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO adminbckang;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO adminbckang;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO adminbckang;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO adminbckang;
+ALTER DATABASE appdbang OWNER TO adminbckang;
 
+THEN
+MAKE A BACKUP OF YOUR LOCAL DATABASE
+& "C:\Program Files\PostgreSQL\18\bin\pg_dump.exe" -h localhost -p 5433 -U adminbckang -d appdbang -F c -f "C:\Users\Alfrredo\appdbang.dump"
 
+THEN
+// pg_restore -h your-aurora-endpoint -p 5432 -U your_user -d newdb --no-owner --no-privileges olddb.dump
+& "C:\Program Files\PostgreSQL\18\bin\pg_restore.exe" -h database-ang.clu6eegyos34.us-east-2.rds.amazonaws.com -p 5432 -U adminbckang -d appdbang --no-owner --no-privileges "C:\Users\Alfrredo\appdbang.dump"
 
+THEN CONNECT AND TEST
+psql -h database-ang.clu6eegyos34.us-east-2.rds.amazonaws.com -U adminbckang -d appdbang
+password: StrongPassw0rd-2029!
+
+TEST IN THIS CASE
+select *from users;
 
 CERATE TABLE
 
