@@ -148,7 +148,6 @@ This section provides a way to run the entire project's validation process with 
   2. **Stage 2 (Frontend)**: Runs Vitest component/logic tests in a single pass.
   3. **Stage 3 (Docker)**: Validates that `docker-compose.yml` can still build everything from scratch.
 
-
 Add all changes:
 powershell
 git add .
