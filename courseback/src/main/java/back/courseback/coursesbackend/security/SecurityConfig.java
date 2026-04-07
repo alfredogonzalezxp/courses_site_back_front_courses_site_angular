@@ -129,7 +129,6 @@ public class SecurityConfig {
 
                         // All other endpoints require the user to be fully authenticated
                         .anyRequest().authenticated());
-
         /*
          * ADDING OUR JWT FILTER TO THE CHAIN
          * 

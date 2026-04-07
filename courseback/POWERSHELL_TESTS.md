@@ -7,14 +7,17 @@ You can copy and paste these blocks directly into a PowerShell window.
 ---
 
 ## 1. Health Checks
+
 Testing to see if the server and the newly added actuator are running.
 
 ### 1.1 Basic API Health Check
+
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:8080/api/health" -Method GET
 ```
 
 ### 1.2 Spring Boot Actuator Health Check
+
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:8080/actuator/health" -Method GET
 ```
@@ -24,6 +27,7 @@ Invoke-RestMethod -Uri "http://localhost:8080/actuator/health" -Method GET
 ## 2. Authentication Flow
 
 ### 2.1 Sign Up (Register a new user)
+
 ```powershell
 $signupBody = @{
     nombre = "Test User"
@@ -39,13 +43,14 @@ Invoke-RestMethod -Uri "http://localhost:8080/api/signup" `
 ```
 
 ### 2.2 Sign In (Get JWT Token)
+
 ```powershell
 $signinBody = @{
-    email = "test@user.com"
-    password = "password123"
+    email = "admin@example.com"
+    password = "alf"
 } | ConvertTo-Json
 
-$response = Invoke-RestMethod -Uri "http://localhost:8080/api/signin" `
+$response = Invoke-RestMethod -Uri "http://springboot-backend-env.eba-vykmuaq8.us-east-2.elasticbeanstalk.com/api/signin" `
                               -Method POST `
                               -ContentType "application/json" `
                               -Body $signinBody
@@ -58,15 +63,18 @@ Write-Host "JWT Token Received: $token"
 ---
 
 ## 3. User Management (CRUD)
-*Note: Depending on your `SecurityConfig.java`, these might eventually require the `$token` variable generated in step 2.2.*
+
+_Note: Depending on your `SecurityConfig.java`, these might eventually require the `$token` variable generated in step 2.2._
 
 ### 3.1 Get All Users
+
 ```powershell
 # Currently configured as permitAll() in SecurityConfig
 Invoke-RestMethod -Uri "http://localhost:8080/api/users" -Method GET
 ```
 
-*(If you later secure this endpoint, you will need to add the header like this):*
+_(If you later secure this endpoint, you will need to add the header like this):_
+
 ```powershell
 # Example of authenticated request
 $headers = @{ Authorization = "Bearer $token" }
@@ -74,6 +82,7 @@ Invoke-RestMethod -Uri "http://localhost:8080/api/users" -Method GET -Headers $h
 ```
 
 ### 3.2 Update User (Requires knowing the User ID, e.g., 1)
+
 ```powershell
 $updateBody = @{
     nombre = "Updated Name"
@@ -89,6 +98,7 @@ Invoke-RestMethod -Uri "http://localhost:8080/api/users/1" `
 ```
 
 ### 3.3 Delete User (Requires knowing the User ID, e.g., 1)
+
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:8080/api/users/1" -Method DELETE
 ```

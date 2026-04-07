@@ -8,7 +8,7 @@ import { User } from './types';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'https://springboot-backend-env.eba-vykmuaq8.us-east-2.elasticbeanstalk.com/api'; // Adjust based on your backend routes
+  private apiUrl = 'http://springboot-backend-env.eba-vykmuaq8.us-east-2.elasticbeanstalk.com/api'; // Adjust based on your backend routes
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,

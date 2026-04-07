@@ -16,7 +16,7 @@ import { LoginRequest, SignupRequest, JwtAuthenticationResponse } from './types'
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://springboot-backend-env.eba-vykmuaq8.us-east-2.elasticbeanstalk.com/api';
+  private apiUrl = 'http://springboot-backend-env.eba-vykmuaq8.us-east-2.elasticbeanstalk.com/api';
 
   // 1. REACTIVE STATE (The Variables)
   // BehaviorSubject: Holds the exact CURRENT value (are they logged in or not?)
