@@ -120,8 +120,10 @@ public class SecurityConfig {
                 // Defines which URLs are public and which require authentication
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints (Login, Signup, Health checks)
-                        .requestMatchers("/api/signin", "/api/signup", "/api/health", "/api/users", "/api/users/{id}")
-                        .permitAll()
+                        .requestMatchers("/api/signin", "/api/signup", "/api/health").permitAll()
+
+                        // User management endpoints restricted to administrators
+                        .requestMatchers("/api/users", "/api/users/**").hasRole("ADMIN")
 
                         // Allows browsers to send 'OPTIONS' pre-flight checks before complex CORS
                         // requests

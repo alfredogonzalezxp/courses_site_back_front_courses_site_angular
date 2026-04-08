@@ -29,8 +29,8 @@ public class CustomUserDetails implements UserDetails {
     // This is override because we implement UserDetails interface.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Un rol simple
-        return List.of(new SimpleGrantedAuthority("ROL_" + user.getRol()));
+        // Standard Spring Security role prefix is "ROLE_"
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRol().toUpperCase()));
     }
 
     // This is override because we implement UserDetails interface

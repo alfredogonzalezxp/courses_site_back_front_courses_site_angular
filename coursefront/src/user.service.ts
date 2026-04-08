@@ -8,7 +8,9 @@ import { User } from './types';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://springboot-backend-env.eba-vykmuaq8.us-east-2.elasticbeanstalk.com/api'; // Adjust based on your backend routes
+  private apiUrl = 'http://localhost:8080/api';
+  //private apiUrl =
+  //'http://mavenspringlatest-env.eba-t2gkudii.us-east-2.elasticbeanstalk.com/api'; // Adjust based on your backend routes
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -35,7 +37,7 @@ export class UserService {
   Notes removed for brevity as HttpClient natively handles Observable returning.
   */
   get(id: any): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${id}`, this.getAuthHeaders());
+    return this.http.get<User>(`${this.apiUrl}/users/${id}`, this.getAuthHeaders());
   }
 
   signup(user: User): Observable<User> {

@@ -49,8 +49,13 @@ export class UserManagementComponent implements OnInit {
 
   deleteUser(id?: number): void {
     if (id && confirm('Are you sure you want to delete this user?')) {
-      this.userService.delete(id).subscribe(() => {
-        this.ngZone.run(() => this.loadUsers());
+      this.userService.delete(id).subscribe({
+        next: () => {
+          this.ngZone.run(() => {
+            this.loadUsers();
+          });
+        },
+        error: (err) => console.error('Error deleting user', err)
       });
     }
   }
@@ -60,26 +65,31 @@ export class UserManagementComponent implements OnInit {
   }
 
   addUser(): void {
-    this.selectedUser = {} as User;
+    this.selectedUser = { rol: 'user' } as User;
   }
 
   saveUser(): void {
-    alert("entro a save user");
     if (this.selectedUser) {
       if (this.selectedUser.id) {
-        this.userService.update(this.selectedUser.id, this.selectedUser).subscribe(() => {
-          this.ngZone.run(() => {
-            this.selectedUser = null;
-            this.loadUsers();
-            this.cdr.detectChanges();
-          });
+        this.userService.update(this.selectedUser.id, this.selectedUser).subscribe({
+          next: () => {
+            this.ngZone.run(() => {
+              this.selectedUser = null;
+              this.loadUsers();
+              this.cdr.detectChanges();
+            });
+          },
+          error: (err) => console.error('Error updating user', err)
         });
       } else {
-        this.userService.signup(this.selectedUser).subscribe(() => {
-          this.ngZone.run(() => {
-            this.selectedUser = null;
-            this.loadUsers();
-          });
+        this.userService.signup(this.selectedUser).subscribe({
+          next: () => {
+            this.ngZone.run(() => {
+              this.selectedUser = null;
+              this.loadUsers();
+            });
+          },
+          error: (err) => console.error('Error creating user', err)
         });
       }
     }
